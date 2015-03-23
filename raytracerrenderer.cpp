@@ -88,7 +88,7 @@ RendererColor RayTracerRenderer::calculatePixel(int i, int j)
 			}
 			else
 			{
-				Vector3 p = lista_esfera[z].devolverp(camara);
+				Vector3 p = lista_triangulo[z].devolverp(camara);
 				Vector3 v = normalizar(camara.e.resta(p));
 				Vector3 l = normalizar(luz.punto.resta(p));
 				aux = chocaluz(p, l, aux);
