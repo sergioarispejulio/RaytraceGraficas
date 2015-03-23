@@ -47,6 +47,9 @@ RendererColor RayTracerRenderer::calculatePixel(int i, int j)
 {
     RendererColor color((float)i / width, (float)j / height, 1.0f);
 	Pixel aux;
+	aux.r = color.getRed();
+	aux.b = color.getBlue();
+	aux.g = color.getGreen();
 	camara.i = i;
 	camara.j = j;
 	float t = 9999999999999999999;
@@ -54,56 +57,42 @@ RendererColor RayTracerRenderer::calculatePixel(int i, int j)
 	{
 		if (lista_esfera[z].intersecta(camara))
 		{
-			Vector3 p = lista_esfera[z].devolverp(camara);
-			Vector3 v = normalizar(camara.e.resta(p));
-			Vector3 l = normalizar(luz.punto.resta(p));
-			if (lista_esfera[z].intersectaluz(p, l))
+			if (lista_esfera[z].t < t && lista_esfera[z].t > 0)
 			{
-				if (lista_esfera[z].t < t && lista_esfera[z].t > 0)
-				{
-					aux = luz.calcularpixelesfera(camara, lista_esfera[z]);
-					color.setRed(aux.r);
-					color.setGreen(aux.g);
-					color.setBlue(aux.b);
-					t = lista_esfera[z].t;
-				}
-			}
-			else
-			{
-				aux = lista_esfera[z].colordifuso.multiplicar(fondoambiente);
+				aux = luz.calcularpixelesfera(camara, lista_esfera[z]);
 				color.setRed(aux.r);
 				color.setGreen(aux.g);
 				color.setBlue(aux.b);
+				t = lista_esfera[z].t;
 			}
-			
+			else
+			{
+				Vector3 p = lista_esfera[z].devolverp(camara);
+				Vector3 v = normalizar(camara.e.resta(p));
+				Vector3 l = normalizar(luz.punto.resta(p));
+				aux = chocaluz(p, l, aux);
+			}
 		}
 	}
 	for (int z = 0; z < lista_triangulo.size(); z++)
 	{
 		if (lista_triangulo[z].intersecta(camara))
 		{
-			Vector3 p = lista_triangulo[z].devolverp(camara);
-			Vector3 v = normalizar(camara.e.resta(p));
-			Vector3 l = normalizar(luz.punto.resta(p));
-			if (lista_triangulo[z].intersectaluz(p, l))
+			if (lista_triangulo[z].t < t && lista_triangulo[z].t > 0)
 			{
-				if (lista_triangulo[z].t < t && lista_triangulo[z].t > 0)
-				{
-					aux = luz.calcularpixeltriangulo(camara, lista_triangulo[z]);
-					color.setRed(aux.r);
-					color.setGreen(aux.g);
-					color.setBlue(aux.b);
-					t = lista_triangulo[z].t;
-				}
-			}
-			else
-			{
-				aux = lista_triangulo[z].colordifuso.multiplicar(fondoambiente);
+				aux = luz.calcularpixeltriangulo(camara, lista_triangulo[z]);
 				color.setRed(aux.r);
 				color.setGreen(aux.g);
 				color.setBlue(aux.b);
+				t = lista_triangulo[z].t;
 			}
-			
+			else
+			{
+				Vector3 p = lista_esfera[z].devolverp(camara);
+				Vector3 v = normalizar(camara.e.resta(p));
+				Vector3 l = normalizar(luz.punto.resta(p));
+				aux = chocaluz(p, l, aux);
+			}
 		}
 	}
     return color;
@@ -115,3 +104,29 @@ Vector3 RayTracerRenderer::normalizar(Vector3 ele)
 	return Vector3(ele.x / aux, ele.y / aux, ele.z / aux);
 }
 
+Pixel RayTracerRenderer::chocaluz(Vector3 e, Vector3 d, Pixel actual)
+{
+	Pixel resu = actual;
+	float t = 9999999999999999999;
+	for (int z = 0; z < lista_esfera.size(); z++)
+	{
+		if (lista_esfera[z].intersectaluz(e,d))
+		{
+			if (lista_esfera[z].tdeluz < t && lista_esfera[z].tdeluz >= 0)
+			{
+				resu = lista_esfera[z].colordifuso.multiplicar(fondoambiente);
+			}
+		}
+	}
+	for (int z = 0; z < lista_triangulo.size(); z++)
+	{
+		if (lista_triangulo[z].intersectaluz(e, d))
+		{
+			if (lista_triangulo[z].tdeluz < t && lista_triangulo[z].tdeluz >= 0)
+			{
+				resu = lista_triangulo[z].colordifuso.multiplicar(fondoambiente);
+			}
+		}
+	}
+	return resu;
+}

@@ -33,7 +33,7 @@ bool Esfera::intersectaluz(Vector3 e, Vector3 d)
 	aux1 = aux1 * ((e.resta(punto).multiplicacionescalar(e.resta(punto)) - (radio*radio)));
 	aux = aux - aux1;
 	palabra = std::to_string(aux);
-	if (palabra.find('#') != -1 || palabra.find('e') != -1)
+	if (palabra.find('#') != -1 || palabra.find('e') != -1 )
 		return false;
 	if (aux >= 0)
 		return true;

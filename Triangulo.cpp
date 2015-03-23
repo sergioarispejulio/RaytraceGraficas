@@ -29,9 +29,9 @@ bool Triangulo::intersecta(Camara camara)
 bool Triangulo::intersectaluz(Vector3 e, Vector3 d)
 {
 	float M = devolverM(d);
-	t = devolvert(d, e, M);
+	tdeluz = devolvert(d, e, M);
 	std::string palabra = std::to_string(t);
-	if (palabra.find('#') != -1 || palabra.find('e') != -1)
+	if (palabra.find('#') != -1 || palabra.find('e') != -1 )
 		return false;
 	float V = devolverV(d, e, M);
 	float B = devolverB(d, e, M);
